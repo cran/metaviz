@@ -1,0 +1,15 @@
+5d09f02167a48470a0b45ef953d43086 *DESCRIPTION
+e9a85d191e159a500702349aabff58aa *NAMESPACE
+3405b47aa91d7d04b260c835bd2bdd96 *R/mozart.R
+554eeaaa8d638c5e19afc08fcbf40038 *R/rainforest.R
+dec78abc3fb640a7c126d4b810d350a9 *R/rem_functions.R
+873f81d81a066c1459742730a2daee91 *build/vignette.rds
+0d3d6db61a430601baa04fc3283dcecb *data/mozart.rda
+86206f632e57880b5d0113efcb59c7b2 *inst/doc/metaviz.R
+d2fc62e2e3f92b26c20809859c082864 *inst/doc/metaviz.Rmd
+499edb7f719613fb50c0cc7583b18caa *inst/doc/metaviz.html
+0bf75770a5276c260eb6d105fa3543fe *man/mozart.Rd
+088d3ecef13a2717e9fc3c8b538e11d1 *man/rainforest.Rd
+c19a33c0a1a36e890731336bbbd2b51c *man/rem_effect.Rd
+83ebf07b6f8f42139668f248b4c7d77f *man/rem_err.Rd
+d2fc62e2e3f92b26c20809859c082864 *vignettes/metaviz.Rmd
