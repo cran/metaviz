@@ -92,8 +92,8 @@ cum_data <- data.frame(x = cum_summary, y = y)
 
 ## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
 p + 
-geom_path(data = cum_data, aes(y = y, x = x), col=" black ", size = 0.5) +
-geom_point(data = cum_data, aes(y = y, x = x), col="black", size = 2, shape = 18)
+geom_path(data = cum_data, aes(y = y, x = x), col = "black", size = 0.5) +
+geom_point(data = cum_data, aes(y = y, x = x), col = "black", size = 2, shape = 18)
 
 ## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
 p + 
