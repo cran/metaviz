@@ -1,114 +1,123 @@
 ## ---- echo = FALSE-------------------------------------------------------
-knitr::opts_chunk$set(collapse =TRUE, comment ="#>")
+knitr::opts_chunk$set(include = TRUE, echo = TRUE, eval = TRUE, message = FALSE, warning = FALSE, 
+                      fig.width = 8, fig.asp = 0.618, out.width = "100%", fig.align = "center", 
+                      cache = T)
 
 ## ------------------------------------------------------------------------
 library(metaviz)
 
 ## ------------------------------------------------------------------------
-head(mozart)
+viz_forest(x = mozart[1:10, c("d", "se")], study_labels = mozart[1:10, c("study_name")],
+           summary_label = "Summary effect", xlab = "Cohen d")
 
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6, fig.width = 6----
-rainforest(x = mozart[, c("d", "se")])
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-rainforest(x = mozart[, c("d", "se")], names = mozart[, "study_name"], 
-           summary_name = "Summary (Fixed effect)", xlab = "Cohen d")
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-rainforest(x = mozart[, c("d", "se")], names = mozart[, "study_name"], 
-           summary_name = "Summary (Random Effects)", xlab = "Cohen d", method = "REM")
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-rainforest(x = mozart[, c("d", "se")], names = mozart[, "study_name"], 
-           summary_name = "Summary (Fixed effect)", xlab = "Cohen d", confidence_level = 0.99)
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 5.5, fig.width = 5.5----
-rainforest(x = mozart[1:5, c("d", "se")], names = mozart[1:10, "study_name"], 
-           summary_symbol = "rain")
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 5.5, fig.width = 5.5----
-rainforest(x = mozart[1:5, c("d", "se")], names = mozart[1:10, "study_name"], 
-           summary_symbol = "diamond")
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 5.5, fig.width = 5.5----
-rainforest(x = mozart[1:5, c("d", "se")], names = mozart[1:10, "study_name"], 
-           summary_symbol = "none")
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-rainforest(x = mozart[, c("d", "se")], names = mozart[, "study_name"], 
-           summary_name = "Summary (Fixed effect)", xlab = "Cohen d", col = "Greys")
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-rainforest(x = mozart[, c("d", "se")], names = mozart[, "study_name"], 
-           summary_name = "Summary (Fixed effect)", xlab = "Cohen d", col = "Greys",
-           shading = FALSE)
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 5.5, fig.width = 5.5----
-rainforest(x = mozart[1:5, c("d", "se")], detail_level = 0.3)
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 5.5, fig.width = 5.5----
-rainforest(x = mozart[1:5, c("d", "se")], detail_level = 2)
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 5.5, fig.width = 5.5----
-rainforest(x = mozart[1:5, c("d", "se")], text_size = 1.5)
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-rainforest(x = mozart[, c("d", "se")], names = mozart[, "study_name"], 
-           summary_name = c("Summary (published)", "Summary (unpublished)"), xlab = "Cohen d", 
-           group = mozart[, "unpublished"])
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_forest(x = mozart[1:10, c("d", "se")], study_labels = mozart[1:10, c("study_name")],
+           summary_label = "Summary effect", xlab = "Cohen d", variant = "rain")
 
 ## ------------------------------------------------------------------------
-group <- interaction(mozart[, "unpublished"], mozart[, "rr_lab"])
+viz_forest(x = mozart[1:10, c("d", "se")], study_labels = mozart[1:10, c("study_name")],
+           summary_label = "Summary effect", xlab = "Cohen d", variant = "thick", method = "FE")
 
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-rainforest(x = mozart[, c("d","se")], names = mozart[, "study_name"], 
-           summary_name = c("Summary published/all other", "Summary unpublished/all other", 
-                            "Summary published/RR lab", " Summary unpublished/RR lab" ),
-           xlab = "Cohen d", group = group)
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_forest(x = mozart[1:10, c("d", "se")], study_labels = mozart[1:10, c("study_name")],
+           summary_label = "Summary effect", xlab = "Cohen d", variant = "rain", method = "DL")
 
-## ------------------------------------------------------------------------
-library(metafor)
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_forest(x = mozart[1:10, c("d", "se")], 
+           group = mozart[1:10, "rr_lab"], 
+           study_labels = mozart[1:10, "study_name"], 
+           summary_label = c("Summary (rr_lab = no)", "Summary (rr_lab = yes)"), 
+           xlab = "Cohen d",
+           col = "Greys",
+           variant = "rain")
 
-## ------------------------------------------------------------------------
-res <- rma.uni(yi = mozart[, "d"], sei = mozart[, "se"])
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_forest(x = mozart[, c("d", "se")], 
+           group = mozart[, "rr_lab"], 
+           study_labels = mozart[, "study_name"], 
+           summary_label = c("Summary (rr_lab = no)", "Summary (rr_lab = yes)"), 
+           xlab = "Cohen d",
+           variant = "thick",
+           type = "cumulative")
 
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5, eval = FALSE----
-#  rainforest(x = res, names = mozart[, "study_name"], xlab = "Cohen d")
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_forest(x = mozart[1:5, c("d", "se")],
+           study_labels = mozart[1:5, "study_name"], 
+           xlab = "Cohen d",
+           variant = "rain",
+           type = "sensitivity")
 
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-res <- rma.uni(yi = mozart[, "d"], sei = mozart[, "se"], mods = ~mozart[, "unpublished"])
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5, eval = FALSE----
-#  rainforest(x = res, names = mozart[, "study_name"], xlab = "Cohen d")
-
-## ------------------------------------------------------------------------
-library(ggplot2)
-p <- rainforest(mozart[, c("d", "se")], names = mozart[, "study_name"])
-
-## ------------------------------------------------------------------------
-cum_summary <- cumsum((1/mozart[, "se"]^2)*mozart[, "d"])/(cumsum(1/mozart[, "se"]^2))
-y <- nrow(mozart):1
-cum_data <- data.frame(x = cum_summary, y = y)
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-p + 
-geom_path(data = cum_data, aes(y = y, x = x), col = "black", size = 0.5) +
-geom_point(data = cum_data, aes(y = y, x = x), col = "black", size = 2, shape = 18)
-
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-p + 
-geom_vline(xintercept =  sum((1/mozart[, "se"]^2)*mozart[, "d"])/(sum(1/mozart[, "se"]^2)), 
-           linetype = 3) +
-theme(axis.title.x = element_text(size = rel(2), colour = "black"),
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor.x = element_blank())
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_forest(x = mozart[1:10, c("d", "se")], 
+           group = mozart[1:10, "rr_lab"],
+           study_labels = mozart[1:10, "study_name"], 
+           summary_label = c("Summary (rr_lab = no)", "Summary (rr_lab = yes)"), 
+           xlab = "Cohen d", 
+           variant = "thick",
+           annotate_CI = TRUE)
 
 ## ------------------------------------------------------------------------
-mozart_OR <- mozart
-mozart_OR[, c("d", "se")] <- mozart_OR[, c("d", "se")]  * pi/sqrt(3)
+study_table <- data.frame(
+  name = exrehab[, "study_name"],
+  eventsT = paste(exrehab$ai, "/", exrehab$ai + exrehab$bi, sep = ""),
+  eventsC = paste(exrehab$ci, "/", exrehab$ci + exrehab$di, sep = ""))
+head(study_table)
 
-## ---- dev='CairoPNG', fig.align = 'center', fig.height = 6.5, fig.width = 6.5----
-p_OR <- rainforest(mozart_OR[, c("d", "se")], names = mozart_OR[, "study_name"])
-p_OR + scale_x_continuous(name = "Odds Ratio", limits = c(-3, 4), breaks = -3:4, 
-                          labels = function(x) {round(exp(x), 2)})
+## ------------------------------------------------------------------------
+summary_table <- data.frame(
+    name = "Summary",
+    eventsT = paste(sum(exrehab$ai), "/", sum(exrehab$ai + exrehab$bi), sep = ""),
+    eventsC = paste(sum(exrehab$ci), "/", sum(exrehab$ci + exrehab$di), sep = ""))
+head(summary_table)
+
+## ---- fig.asp = 0.5, fig.width = 10--------------------------------------
+viz_forest(x = exrehab[, c("logrr", "logrr_se")], variant = "classic",
+col = "Greys", xlab = "logRR", annotate_CI = T, 
+study_table = study_table,
+summary_table = summary_table,
+table_headers = c("ID", "Events (T)", "Events (C)"))
+
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_forest(x = exrehab[, c("logrr", "logrr_se")], variant = "classic",
+col = "Greys", xlab = "logRR", x_limit = c(-0.35, 0.05),
+annotate_CI = T, type = "sensitivity",
+study_table = data.frame(left_out = exrehab[, "study_name"],
+                         remaining_N = sum(exrehab[, "n1i"] + exrehab[, "n2i"]) - 
+                           (exrehab[, "n1i"] + exrehab[, "n2i"])),
+summary_table = "None",
+table_headers = c("Study left out", "N remaining", "log Risk Ratio [95% CI]"),
+table_layout = matrix(c(1, 2, 3), nrow = 1))
+
+## ---- fig.asp = 0.5, fig.width = 10--------------------------------------
+viz_forest(x = exrehab[, c("logrr", "logrr_se")], variant = "thick",
+study_labels = exrehab[, "study_name"], col = "Greys", 
+study_table = study_table,
+summary_table = summary_table,
+annotate_CI = T,
+table_headers = c("ID", "Events (T)", "Events (C)"),
+x_trans_function = exp, xlab = "RR")
+
+## ---- echo = FALSE-------------------------------------------------------
+knitr::opts_chunk$set(include = TRUE, echo = TRUE, eval = TRUE, message = FALSE, warning = FALSE, 
+                      fig.width = 5, fig.asp = 0.9, out.width = "60%", fig.align = "center", 
+                      cache = T)
+
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_funnel(brainvol[, c("z", "z_se")])
+
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_funnel(brainvol[, c("z", "z_se")],
+           method = "DL",
+           contours_col = "Greys",
+           xlab = "r", x_trans_function = tanh, 
+           x_breaks = atanh(c(-0.9, -0.7, -0.3, 0, 0.3, 0.7, 0.9)))
+
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_funnel(exrehab[, c("logrr", "logrr_se")], 
+           contours_col = "Greys",
+           trim_and_fill = TRUE, trim_and_fill_side = "right", 
+           egger = TRUE)
+
+## ---- dev='CairoPNG'-----------------------------------------------------
+viz_funnel(mozart[1:10, c("d", "se")], sig_contours = FALSE, addev_contours = TRUE)
 

@@ -4,70 +4,112 @@
 \alias{funnelinf}
 \title{Visual funnel plot inference for meta-analysis}
 \usage{
-funnelinf(x, group = NULL, group_permut = FALSE, n = 20, y_axis = "se",
-  null_model = "FEM", contours = TRUE, sig_contours = TRUE,
-  trim_and_fill = FALSE, trim_and_fill_side = "left", egger = FALSE,
-  show_solution = FALSE)
+funnelinf(x, group = NULL, group_permut = FALSE, n = 20,
+  null_model = "REM", y_axis = "se", contours = TRUE,
+  sig_contours = TRUE, contours_col = "Blues", trim_and_fill = FALSE,
+  trim_and_fill_side = "left", egger = FALSE, show_solution = FALSE,
+  rorschach = FALSE, point_size = 1.5, text_size = 3, xlab = "Effect",
+  ylab = NULL, x_trans_function = NULL, x_breaks = NULL)
 }
 \arguments{
 \item{x}{data.frame or matrix with the effect sizes of all studies (e.g.,
 correlations, log odds ratios, or Cohen \emph{d}) in the first column and their
-respective standard errors in the second column.}
+respective standard errors in the second column. Alternatively, x can be the
+output object of function \code{\link[metafor]{rma.uni}} from package
+\pkg{metafor}; then effect sizes and standard errors are extracted from \code{x}.}
 
-\item{group}{a factor indicating the subgroup of each study.}
+\item{group}{factor indicating the subgroup of each study to show in the funnel plot. Has to be in the same order than \code{x}.}
 
 \item{group_permut}{logical scalar indicating if subgroup membership should be permutated
 in the null plots. Ignored if no group is supplied.}
 
-\item{n}{integer specifying the absolute number of plots (null plots plus plot of real data)}
+\item{n}{integer specifying the absolute number of plots in the lineup.}
 
-\item{y_axis}{Which y axis should be used in the funnel plot? Available options are se (default) for
-standard error and precision for the reciprocal of the standard error.}
+\item{null_model}{character string indicating which meta-analytic model should be used to simulate the effect sizes for the null plots.
+Available options are "FEM" for the fixed effect model and "REM" (default) for the random-effects model (using the
+DerSimonian-Laird method to estimate the between-study variance \eqn{\tau^2}{tau squared}).}
 
-\item{null_model}{Which meta-analytic model should be used to simulate the effect sizes for the null plots?
-Available options are FEM for the fixed effect model and REM for the random-effects model (using the
-DerSimonian-Laird method to estimate the between-study variance \eqn{\tau^2}{tau squared})}
+\item{y_axis}{character string indicating which y axis should be used in the funnel plot. Available options are "se" (default) for
+standard error and "precision" for the reciprocal of the standard error.}
 
-\item{contours}{logical scalar indicating if classic funnel plot contours should be displayed (i.e., summary effect +/-
-rnorm(0.975) * SE).}
+\item{contours}{logical scalar indicating if classic funnel plot confidence contours and the summary effect should be displayed (i.e., summary effect +/-
+qnorm(0.975) * SE).}
 
-\item{sig_contours}{logical scalar. Should significance contours should be drawn? Significance contours show which combination of
-effect size and standard error lead to p-values smaller than 0.05 or 0.01 (using a Wald test).}
+\item{sig_contours}{logical scalar. Should significance contours be drawn? Significance contours show which combination of
+effect size and standard error lead to study p-values smaller than 0.05 or 0.01 (using a Wald test).}
 
-\item{trim_and_fill}{logical scalar. Should studies imputed by the trim and fill method be displayed?}
+\item{contours_col}{character string indicating the color palette used from package \pkg{RColorBrewer} for
+\code{sig_contours}. Can be any of "Blues", "Greys", "Oranges", "Greens", "Reds", and "Purples".}
 
-\item{trim_and_fill_side}{On which side should studies be imputed by the trim and fill method? Available options are
-right or left.}
+\item{trim_and_fill}{logical scalar. Should studies imputed by the trim and fill method be displayed? Also shows the adjusted summary
+effect if \code{contours} is \code{TRUE} as well.}
 
-\item{egger}{logical scalar. Should Egger's regression line be drawn?}
+\item{trim_and_fill_side}{character string indicating on which side of the funnel plot studies should be imputed by the trim and fill method (i.e., on which side are studies presumably missing due to publication bias).
+Must be either "right" or "left" (default).}
 
-\item{show_solution}{logical scalar. Should the plot with the real data be highlighted? Default is FALSE.}
+\item{egger}{logical scalar. Should Egger's regression line be drawn? Only available if \code{y_axis} is \code{"se"}.}
+
+\item{show_solution}{logical scalar. Should the real-data plot be highlighted?}
+
+\item{rorschach}{logical scalar. Should the lineup only consist of null plots?}
+
+\item{point_size}{numeric value. Size of the study points in the funnel plots.}
+
+\item{text_size}{numeric value. Size of text in the lineup.}
+
+\item{xlab}{character string specifying the label of the x axis.}
+
+\item{ylab}{character string specifying the label of the y axis.}
+
+\item{x_trans_function}{function to transform the labels of the x axis. Common uses are to transform
+log-odds-ratios or log-risk-ratios with \code{exp} to their original scale (odds ratios and risk ratios), or Fisher's z values
+back to correlation coefficients using \code{tanh}.}
+
+\item{x_breaks}{numeric vector of values for the breaks on the x-axis. When used in tandem with \code{x_trans_function}
+the supplied values should be not yet transformed.}
 }
 \value{
 A lineup of n (20 by default) funnel plots; one showing the real data and n-1 showing
  simulated data under the null hypothesis
 }
 \description{
-Creates a lineup of funnel plots to conduct visual funnel plot inference. The funnel plot showing the real, supplied data is
+Creates a lineup of funnel plots to conduct visual funnel plot inference. The funnel plot showing the actually observed, supplied data is
 presented alongside null plots showing simulated data under the null hypothesis.
 }
 \details{
 Funnel plots are widely used in meta-analysis to detect small study effects and in particular publication bias.
 However, interpretations of funnel plots often lead to false conclusions (e.g., Terrin, Schmid, and Lau, 2005). Visual inference
-(Buja et al. 2009; Majumder, Hofmann, and Cook 2013) can help to improve the validity of such funnel plot based conclusions.
-If the alternative hypothesis is true (e.g., small study effects led to an asymmetric funnel plot), the funnel plot showing the real data
-should be identifiable when presented alongside funnel plots of simulated data under the null hypothesis. Only if this is possible,
-conclusion based on the funnel plot might be warranted.
+(Buja et al. 2009; Majumder, Hofmann, and Cook 2013) can help to improve the validity of conclusions based on the visual inspection of a
+funnel plot, by saving investigators from interpreting funnel-plot patterns which might be perfectly plausible by chance.
+Only if the real-data funnel plot is identifiable from null-plots, the null hypothesis is formally rejected and
+conclusions based on the visual inspection of the real-data funnel plot might be warranted.
+
+Function \code{funnelinf} utilizes package \pkg{nullabor} for null plot simulation and \pkg{ggplot2} for
+plotting the lineup. Several tailored features for visual inference with funnel plots are provided which currently include:
+\enumerate{
+\item options for null-plot simulation under both FEM and REM meta-analysis (see below).
+\item subgroup analysis.
+\item graphical options specific to the funnel plot (significance and confidence contours, and choice of the ordinate).
+\item additional options to display various statistical information (Egger's regression line, and imputed studies by, as well as the adjusted summary effect from, the trim-and-fill method).
+}
+
+Null plots are simulated assuming normally distributed effect sizes with expected value equal to the observed summary effect and variance
+either equal to the observed study variances (\code{null_model = "FEM"}) or the sum of the observed study variances and the estimated
+between study variance \eqn{\tau^2}{tau squared} (\code{null_model = "REM"}).
 }
 \examples{
 \dontrun{
+# Plotting a funnel plot lineup with the exrehab data to conduct visual funnel plot inference
+funnelinf(x = exrehab[, c("logrr", "logrr_se")])
+
 # Plotting a funnel plot lineup with the mozart data to conduct visual funnel plot inference
-# considering subgroups (for details, see help(mozart)):
+# considering subgroups
 funnelinf(x = mozart[, c("d", "se")],
 group = mozart[, "rr_lab"],
 group_permut = TRUE, null_model = "REM")
+
 # Plotting a funnel plot lineup with the brainvolume data to conduct visual funnel plot inference
-# considering heterogeneity (for details, see help(brainvol)):
+# considering heterogeneity by using the fixed effect model for null plot simulation
 funnelinf(x = brainvol[, c("z", "z_se")],
 null_model = "FEM")
 }
