@@ -340,7 +340,7 @@ viz_funnel <- function(x, group = NULL, y_axis = "se", method = "FE",
   # standard error on the y axis
   if(y_axis =="se") {
     plotdata$y <- se
-    max_se <- max(se) + ifelse(length(se) > 1, diff(range(se))*0.1, max(se)*0.1)
+    max_se <- max(se) + ifelse(diff(range(se)) != 0, diff(range(se))*0.1, max(se)*0.1)
     y_limit <- c(0, max_se)
 
     if(is.null(ylab)) {
@@ -390,8 +390,8 @@ viz_funnel <- function(x, group = NULL, y_axis = "se", method = "FE",
       plotdata$y <- 1/se
 
       # inital value for upper y axis limit
-      max_y <- max(1/se) + ifelse(length(se) > 1, diff(range(1/se))*0.05, 1/se*0.05)
-      min_y <- min(1/se) - ifelse(length(se) > 1, diff(range(1/se))*0.05, 1/se*0.05)
+      max_y <- max(1/se) + ifelse(diff(range(se)) != 0, diff(range(1/se))*0.05, 1/se*0.05)
+      min_y <- min(1/se) - ifelse(diff(range(se)) != 0, diff(range(1/se))*0.05, 1/se*0.05)
 
       if(is.null(ylab)) {
         ylab <- "Precision (1/SE)"
@@ -456,7 +456,7 @@ viz_funnel <- function(x, group = NULL, y_axis = "se", method = "FE",
 
     } else {
       # set search grid für y_axis == "precision"
-      y_range <- c(max_y + diff(range(x_limit))*0.2, min_y - diff(range(x_limit))*0.2)
+      y_range <- c(max_y + diff(range(y_limit))*0.2, min_y - diff(range(y_limit))*0.2)
       x_range <- c(min_x - diff(range(x_limit))*0.2, max_x + diff(range(x_limit))*0.2)
 
       step <- abs(summary_es - x_range[1])/ (150 * detail_level - 1)

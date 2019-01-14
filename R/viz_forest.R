@@ -7,7 +7,7 @@
 #'to flexibly customize the visual appearance and statistical information displayed are provided. In addition,
 #'rainforest plots as well as the thick forest plots can be created, two variants and enhancements of the
 #'classical forest plot recently proposed by Schild and Voracek (2015). For further details see the documentation of
-#'\code{\link[metaviz]{viz_rainforest}}, and \code{\link[metaviz]{viz_thickforest}}.
+#'the wrapper functions \code{\link[metaviz]{viz_rainforest}}, and \code{\link[metaviz]{viz_thickforest}}.
 #'
 #'\bold{Available forest plot types}
 #'
@@ -26,10 +26,10 @@
 #'@param group factor indicating the subgroup of each study to plot a subgroup forest plot. Has to be in the same order than \code{x}.
 #'@param type character string indicating the type of forest plot to be plotted. Can be "standard" (default), "study_only",
 #'  "summary_only", "cumulative", or "sensitivity". See 'Details'.
-#'@param variant character string indicating the forest plot variant that should be plotted. Can be "rain" for rainforest plot,
-#'  "thick" for a thick forest plot, or "classic" (default) for a traditional forest plot.
+#'@param variant character string indicating the forest plot variant that should be plotted. Can be "classic" (default) for a traditional forest plot,
+#'  "rain" for rainforest plot, "thick" for a thick forest plot.
 #'@param method character string indicating which method should be used to compute the study weights and summary effect(s).
-#'  Can be any method argument from \code{\link[metafor]{rma.uni}}
+#'  Can be any method argument from function \code{rma.uni} of package \pkg{metafor}
 #'  (e.g., "FE" for the fixed effect model, or "DL" for the random effects model using the
 #'  DerSimonian-Laird method to estimate \eqn{\tau^2}{tau squared}).
 #'@param study_labels a character vector with names/identifiers to annotate each study in the forest plot.
@@ -39,23 +39,28 @@
 #'  subgroup summary effect, arranged in the order of the levels of \code{group}. Ignored if \code{study_table} and/or
 #'  \code{summary_table} is supplied.
 #'@param confidence_level numeric value. The confidence level for the plotted confidence intervals.
-#'@param col character string specifying the main color for plotting. For \code{variant = "rain"} must be one of the following palettes from package
-#' \pkg{RColorBrewer}: "Blues", "Greys", "Oranges", "Greens", "Reds", or "Purples".
+#'@param col character string specifying the main color for plotting study-level results. For \code{variant = "thick"} and \code{variant = "classic"} can be a vector of length \code{nrow(x)}
+#'  with colors for each study-level result individually.
+#'  For \code{variant = "rain"} must be one of the following palettes from package
+#'  \pkg{RColorBrewer}: "Blues", "Greys", "Oranges", "Greens", "Reds", or "Purples".
+#'@param summary_col character string specifying the main color for plotting the summary effect(s). For \code{variant = "thick"} and \code{variant = "classic"} can be a vector
+#'  with colors for each subgroup summary effect individually. For \code{variant = "rain"} with \code{type = "summary_only"} must be one of the following palettes from package
+#'  \pkg{RColorBrewer}: "Blues", "Greys", "Oranges", "Greens", "Reds", or "Purples".
 #'@param text_size numeric value. Size of text in the forest plot. Default is 3.
 #'@param xlab character string specifying the label of the x axis. By default also used for the header of the aligned table if \code{annotate_CI} is \code{TRUE}.
 #'@param x_limit numeric vector of length 2 with the limits (minimum, maximum) of the x axis.
 #'@param x_trans_function function to transform the labels of the x axis. Common uses are to transform
 #'  log-odds-ratios or log-risk-ratios with \code{exp} to their original scale (odds ratios and risk ratios), or Fisher's z values
-#'  back to correlation coefficients using \code{tanh}. See vignette('metaviz').
+#'  back to correlation coefficients using \code{tanh}.
 #'@param x_breaks numeric vector of values for the breaks on the x-axis. When used in tandem with \code{x_trans_function}
 #'  the supplied values should be not yet transformed.
 #'@param annotate_CI logical scalar. Should the effect size and confidence interval values be shown as text in an aligned table on the right-hand side of the forest plot?
 #'@param study_table a data.frame with additional study-level variables which should be shown in an aligned table.
-#'  Has to be in the same order than \code{x}. See vignette('metaviz').
+#'  Has to be in the same order than \code{x}.
 #'@param summary_table a data.frame with additional summary-level information shown in an aligned table.
 #'  If \code{group} is supplied, \code{summary_table} must have a row for each subgroup
-#'  summary effect, arranged in the order of the levels of \code{group}. See vignette('metaviz').
-#'@param table_headers character vector. Headers for each column of aligned tables via \code{study_table}, \code{summary_table}, or \code{annotate_CI}.
+#'  summary effect, arranged in the order of the levels of \code{group}.
+#'@param table_headers character vector. Headers for each column of aligned tables via \code{study_table}, \code{summary_table}, and/or \code{annotate_CI}.
 #'@param table_layout numeric layout matrix passed to \code{layout_matrx} of \code{\link[gridExtra]{arrangeGrob}}. Can be used to overwrite the default spacing
 #'  of the forest plot and aligned tables via \code{study_table}, \code{summary_table}, and \code{annotate_CI}.
 #'@param ... further arguments passed to \code{\link[metaviz]{viz_rainforest}} for \code{variant = "rain"}, or
@@ -96,7 +101,7 @@
 #'@export
 viz_forest <- function(x, group = NULL, type = "standard", variant = "classic", method = "FE",
                             study_labels = NULL, summary_label = NULL,
-                            confidence_level = 0.95, col = "Blues",
+                            confidence_level = 0.95, col = "Blues", summary_col = col,
                             text_size = 3, xlab = "Effect", x_limit = NULL,
                             x_trans_function = NULL, x_breaks = NULL,
                             annotate_CI = FALSE, study_table = NULL, summary_table = NULL,
@@ -184,65 +189,109 @@ viz_forest <- function(x, group = NULL, type = "standard", variant = "classic", 
   # main data
   x <- data.frame(es, se, group)
 
-  if(n <= 1 && type == "sensitivity") {
-    stop('For type = "sensitvitiy" there has to be more than 1 study.')
+
+  # check col is of length 1, or nrow(x) in case of variant classic or thick
+  if(type != "summary_only") {
+    if(variant == "rain") {
+      stopifnot(length(col) == 1)
+    } else {
+      if(variant == "thick" || variant == "classic") {
+        stopifnot(length(col) == 1 || length(col) == nrow(x))
+      }
+    }
   }
+  # check summary_col is of length 1, or length(levels(group)) in case of variant classic or thick
+  if(type != "study_only") {
+    if(variant == "rain") {
+      stopifnot(length(summary_col) == 1)
+    } else {
+      if(variant == "thick" || variant == "classic") {
+        stopifnot(length(summary_col) == 1 || length(summary_col) == k)
+      }
+    }
+  }
+
+  if(n <= 1 && type == "sensitivity") {
+    stop('For type = "sensitivity" there has to be more than 1 study.')
+  }
+
 
   # Compute meta-analytic summary effect estimates
   if(type %in% c("standard", "summary_only", "sensitivity", "cumulative")) {
     M <- NULL # To avoid "no visible binding for global variable" warning for non-standard evaluation
     # compute meta-analytic summary effect for each group
+    get_bse <- function(es, se, type = "b") {
+      res <- metafor::rma.uni(yi = es, sei = se, method = method)
+      if(type == "b") {
+        res$b[[1]]
+      } else {
+        if(type == "se") {
+          res$se[[1]]
+        } else {
+          stop()
+        }
+      }
+    }
     M <- x %>%
       group_by(group) %>%
-      summarise(M = metafor::rma.uni(yi = es, sei = se, method = method)$b[[1]]) %>%
+      summarise(M = get_bse(es, se, type = "b")) %>%
       select(M)
       summary_es <-  unlist(M)
 
     # compute standard error of the meta-analytic summary effect for each group
     M <- x %>%
       group_by(group) %>%
-      summarise(M = metafor::rma.uni(yi = es, sei = se, method = method)$se[[1]]) %>%
+      summarise(M = get_bse(es, se, type = "se")) %>%
       select(M)
       summary_se <- unlist(M)
+
     if(type == "sensitivity") {
-      loo_es <- function(es, se) {
+      loo <- function(es, se, type = "b") {
         res <- numeric(length(es))
-        for(i in 1:length(es)) {
-          res[i] <- metafor::rma.uni(yi = es[-i], sei = se[-i], method = method)$b[[1]]
+        if(type == "b") {
+          for(i in 1:length(es)) {
+            res[i] <- metafor::rma.uni(yi = es[-i], sei = se[-i], method = method)$b[[1]]
+          }
+          res
+        } else {
+          if(type == "se") {
+            for(i in 1:length(es)) {
+              res[i] <- metafor::rma.uni(yi = es[-i], sei = se[-i], method = method)$se[[1]]
+            }
+            res
+          } else {
+            stop()
+          }
         }
-        res
-      }
-      loo_se <- function(es, se) {
-        res <- numeric(length(es))
-        for(i in 1:length(es)) {
-          res[i] <- metafor::rma.uni(yi = es[-i], sei = se[-i], method = method)$se[[1]]
-        }
-        res
       }
       sens_data <- x %>%
         group_by(group) %>%
-        mutate(summary_es = loo_es(es, se),
-               summary_se = loo_se(es, se))
+        mutate(summary_es = loo(es, se, type = "b"),
+               summary_se = loo(es, se, type = "se"))
     }
     if(type == "cumulative") {
-      rollingma_es <- function(es, se) {
+      rollingma <- function(es, se, type = "b") {
         res <- numeric(length(es))
-        for(i in 1:length(es)) {
-          res[i] <- metafor::rma.uni(yi = es[1:i], sei = se[1:i], method = method)$b[[1]]
+        if(type == "b") {
+          for(i in 1:length(es)) {
+            res[i] <- metafor::rma.uni(yi = es[1:i], sei = se[1:i], method = method)$b[[1]]
+          }
+          res
+        } else {
+          if(type == "se") {
+            for(i in 1:length(es)) {
+              res[i] <- metafor::rma.uni(yi = es[1:i], sei = se[1:i], method = method)$se[[1]]
+            }
+            res
+          } else {
+            stop()
+          }
         }
-        res
-      }
-      rollingma_se <- function(es, se) {
-        res <- numeric(length(es))
-        for(i in 1:length(es)) {
-          res[i] <- metafor::rma.uni(yi = es[1:i], sei = se[1:i], method = method)$se[[1]]
-        }
-        res
       }
       cum_data <- x %>%
         group_by(group) %>%
-        mutate(summary_es = rollingma_es(es, se),
-               summary_se = rollingma_se(es, se))
+        mutate(summary_es = rollingma(es, se, type = "b"),
+               summary_se = rollingma(es, se, type = "se"))
     }
   } else {
     if(type != "study_only") {
@@ -254,9 +303,12 @@ viz_forest <- function(x, group = NULL, type = "standard", variant = "classic", 
   if(type %in% c("standard", "study_only")) {
     if(method != "FE") {
     # compute tau squared for each group
+    get_tau2 <- function(es, se) {
+      metafor::rma.uni(yi = es, sei = se, method = method)$tau2[[1]]
+    }
     M <- x %>%
       group_by(group) %>%
-      summarise(M = metafor::rma.uni(yi = es, sei = se, method = method)$tau2[[1]]) %>%
+      summarise(M = get_tau2(es, se)) %>%
       select(M)
      summary_tau2 <- unlist(M)
     } else {
@@ -341,6 +393,7 @@ viz_forest <- function(x, group = NULL, type = "standard", variant = "classic", 
                            "group"= group,
                            "x_min" = es - stats::qnorm(1 - (1 - confidence_level)/2)*se,
                            "x_max" = es + stats::qnorm(1 - (1 - confidence_level)/2)*se)
+
     if(type == "standard") {
       madata <- data.frame("summary_es" = summary_es,
                            "summary_se" = summary_se,
@@ -392,17 +445,18 @@ viz_forest <- function(x, group = NULL, type = "standard", variant = "classic", 
             study_labels = study_labels, summary_label = summary_label,
             study_table = study_table, summary_table = summary_table,
             annotate_CI = annotate_CI, confidence_level = confidence_level, col = col,
+            summary_col = summary_col,
             text_size = text_size, xlab = xlab, x_limit = x_limit,
             x_trans_function = x_trans_function, x_breaks = x_breaks), list(...))
 
   if(variant == "rain") {
-    p <- do.call(viz_rainforest_internal, args)
+    p <- do.call(internal_viz_rainforest, args)
   } else {
     if(variant == "thick") {
-      p <- do.call(viz_thickforest_internal, args)
+      p <- do.call(internal_viz_thickforest, args)
     } else {
       if(variant == "classic") {
-        p <- do.call(viz_classicforest_internal, args)
+        p <- do.call(internal_viz_classicforest, args)
       } else {
         stop("The argument of variant must be one of rain, thick or classic.")
       }

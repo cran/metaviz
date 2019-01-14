@@ -6,10 +6,11 @@
 \usage{
 viz_thickforest(x, group = NULL, type = "standard", method = "FE",
   study_labels = NULL, summary_label = NULL, confidence_level = 0.95,
-  col = "Blues", tick_col = "firebrick", text_size = 3, xlab = "Effect",
-  x_limit = NULL, x_trans_function = NULL, x_breaks = NULL,
-  annotate_CI = FALSE, study_table = NULL, summary_table = NULL,
-  table_headers = NULL, table_layout = NULL)
+  col = "Blues", summary_col = col, tick_col = "firebrick",
+  text_size = 3, xlab = "Effect", x_limit = NULL,
+  x_trans_function = NULL, x_breaks = NULL, annotate_CI = FALSE,
+  study_table = NULL, summary_table = NULL, table_headers = NULL,
+  table_layout = NULL)
 }
 \arguments{
 \item{x}{data.frame or matrix with the effect sizes of all studies (e.g.,
@@ -38,7 +39,11 @@ subgroup summary effect, arranged in the order of the levels of \code{group}. Ig
 
 \item{confidence_level}{numeric value. The confidence level for the plotted confidence bars.}
 
-\item{col}{character string specifying the color used for the error bars and summary diamond.}
+\item{col}{character string specifying the color used for the study-level error bars. Can be a vector of length \code{nrow(x)}
+with colors for each study-level result individually.}
+
+\item{summary_col}{character string specifying the main color for plotting the summary effect(s). Can be a vector
+with colors for each subgroup summary effect individually.}
 
 \item{tick_col}{character string specifying the color used for the ticks indicating the point estimates.}
 
@@ -50,7 +55,7 @@ subgroup summary effect, arranged in the order of the levels of \code{group}. Ig
 
 \item{x_trans_function}{function to transform the labels of the x axis. Common uses are to transform
 log-odds-ratios or log-risk-ratios with \code{exp} to their original scale (odds ratios and risk ratios), or Fisher's z values
-back to correlation coefficients using \code{tanh}. See vignette('metaviz').}
+back to correlation coefficients using \code{tanh}.}
 
 \item{x_breaks}{numeric vector of values for the breaks on the x-axis. When used in tandem with \code{x_trans_function}
 the supplied values should be not yet transformed.}
@@ -58,16 +63,16 @@ the supplied values should be not yet transformed.}
 \item{annotate_CI}{logical scalar. Should the effect size and confidence interval values be shown as text in an aligned table on the right-hand side of the forest plot?}
 
 \item{study_table}{a data.frame with additional study-level variables which should be shown in an aligned table.
-Has to be in the same order than \code{x}. See vignette('metaviz').}
+Has to be in the same order than \code{x}.}
 
 \item{summary_table}{a data.frame with additional summary-level information shown in an aligned table.
 If \code{group} is supplied, \code{summary_table} must have a row for each subgroup
-summary effect, arranged in the order of the levels of \code{group}. See vignette('metaviz').}
+summary effect, arranged in the order of the levels of \code{group}.}
 
 \item{table_headers}{character vector. Headers for each column of aligned tables via \code{study_table}, \code{summary_table}, or \code{annotate_CI}.}
 
 \item{table_layout}{numeric layout matrix passed to \code{layout_matrx} of \code{\link[gridExtra]{arrangeGrob}}. Can be used to overwrite the default spacing
-of the forest plot and aligned tables via \code{study_table}, \code{summary_table}, and \code{annotate_CI}. See vignette('metaviz').}
+of the forest plot and aligned tables via \code{study_table}, \code{summary_table}, and \code{annotate_CI}.}
 }
 \value{
 A thick forest plot is created using ggplot2.
@@ -99,15 +104,6 @@ Note that for subgroup analysis the height of each error bar is scaled by the we
 the sum of the weights of all studies irrespective of subgroup. Therefore, with subgroups present, the overall impression of error
 bar heights within a given subgroup compared to other subgroups conveys information about the relative precision of the meta-analytic
 estimate within the subgroup.
-
-\bold{Available forest plot types}
-
-Different aspects of meta-analytic data can be shown in forest plots. Five different types are available in \code{viz_forest} via the \code{type} parameter.
-Argument \code{"standard"} (default) shows study results as well as summary results in the forest plot. \code{"study_only"} allows to only show study results without the meta-analytic summary estimate.
-\code{"summary_only"} can be used to only show meta-analytic summary estimate(s), which is primarily useful to visualize several subgroup results (using \code{group}).
-\code{"cumulative"} shows a cumulative meta-analysis, that is, meta-analytic summary effects are computed sequentially by adding each study one-by-one.
-Studies are added in the same order than they were supplied in \code{x}. Finally, \code{"sensitivity"} shows for each study the meta-analytic summary
-effect if that particular study is not considered in the computation of the summary effect (leave-one-out analysis).
 }
 \examples{
 library(metaviz)

@@ -1,14 +1,14 @@
 #' Visual funnel plot inference for meta-analysis
 #'
-#' Creates a lineup of funnel plots to conduct visual funnel plot inference. The funnel plot showing the actually observed, supplied data is
+#' Creates a lineup of funnel plots to conduct visual funnel plot inference (Kossmeier, Tran, & Voracek, 2019). The funnel plot showing the actually supplied data is
 #' presented alongside null plots showing simulated data under the null hypothesis.
 #'
-#' Funnel plots are widely used in meta-analysis to detect small study effects and in particular publication bias.
-#' However, interpretations of funnel plots often lead to false conclusions (e.g., Terrin, Schmid, and Lau, 2005). Visual inference
-#' (Buja et al. 2009; Majumder, Hofmann, and Cook 2013) can help to improve the validity of conclusions based on the visual inspection of a
-#' funnel plot, by saving investigators from interpreting funnel-plot patterns which might be perfectly plausible by chance.
-#' Only if the real-data funnel plot is identifiable from null-plots, the null hypothesis is formally rejected and
-#' conclusions based on the visual inspection of the real-data funnel plot might be warranted.
+#' Funnel plots are widely used in meta-analysis to assess small study effects as potential indicator for publication bias.
+#' However, interpretations of funnel plots often lead to false conclusions about the presence and severity of bias (e.g., Terrin, Schmid, and Lau, 2005).
+#' Visual inference (Buja et al. 2009; Majumder, Hofmann, and Cook 2013) can help to improve the validity of conclusions based on the visual inspection of a
+#' funnel plot by saving investigators from interpreting funnel-plot patterns which might be perfectly plausible by chance.
+#' Only if the real-data funnel plot is distinguishable from null-plots, the null hypothesis is formally rejected and
+#' conclusions based on the visual inspection of the real-data funnel plot might be warranted (for further details, see Kossmeier, Tran, & Voracek, 2019).
 #'
 #' Function \code{funnelinf} utilizes package \pkg{nullabor} for null plot simulation and \pkg{ggplot2} for
 #' plotting the lineup. Several tailored features for visual inference with funnel plots are provided which currently include:
@@ -26,10 +26,10 @@
 #'@param x data.frame or matrix with the effect sizes of all studies (e.g.,
 #'  correlations, log odds ratios, or Cohen \emph{d}) in the first column and their
 #'  respective standard errors in the second column. Alternatively, x can be the
-#'  output object of function \code{\link[metafor]{rma.uni}} from package
+#'  output object of function \code{rma.uni} from package
 #'  \pkg{metafor}; then effect sizes and standard errors are extracted from \code{x}.
 #'@param group factor indicating the subgroup of each study to show in the funnel plot. Has to be in the same order than \code{x}.
-#'@param group_permut logical scalar indicating if subgroup membership should be permutated
+#'@param group_permut logical scalar indicating if subgroup membership should be permuted
 #'  in the null plots. Ignored if no group is supplied.
 #'@param n integer specifying the absolute number of plots in the lineup.
 #'@param y_axis character string indicating which y axis should be used in the funnel plot. Available options are "se" (default) for
@@ -45,7 +45,7 @@
 #'  \code{sig_contours}. Can be any of "Blues", "Greys", "Oranges", "Greens", "Reds", and "Purples".
 #'@param trim_and_fill logical scalar. Should studies imputed by the trim and fill method be displayed? Also shows the adjusted summary
 #'  effect if \code{contours} is \code{TRUE} as well.
-#'@param trim_and_fill_side character string indicating on which side of the funnel plot studies should be imputed by the trim and fill method (i.e., on which side are studies presumably missing due to publication bias).
+#'@param trim_and_fill_side character string indicating on which side of the funnel plot studies should be imputed by the trim and fill method (i.e., on which side studies are presumably missing due to publication bias).
 #'  Must be either "right" or "left" (default).
 #'@param egger logical scalar. Should Egger's regression line be drawn? Only available if \code{y_axis} is \code{"se"}.
 #'@param show_solution logical scalar. Should the real-data plot be highlighted?
@@ -63,6 +63,7 @@
 #'  Statistical inference for exploratory data analysis and model diagnostics.
 #'  \emph{Philosophical Transactions of the Royal Society of London A: Mathematical, Physical and Engineering Sciences},
 #'  \emph{367}, 4361-4383.
+#'@references Kossmeier, M., Tran, U. & Voracek, M. (2019) Visual inference for the funnel plot in meta-analysis. \emph{Zeitschrift für Psychologie - Journal of Psychology}, \emph{227}.
 #'@references Majumder, M., Hofmann, H., & Cook, D. (2013). Validation of visual statistical inference, applied to linear models.
 #'  \emph{Journal of the American Statistical Association}, \emph{108}, 942-956.
 #'@references Terrin, N., Schmid, C. H., & Lau, J. (2005). In an empirical evaluation of the funnel plot, researchers could not
@@ -208,7 +209,6 @@ funnelinf <- function(x, group = NULL, group_permut = FALSE, n = 20, null_model 
   } else {
     x <- nullabor::rorschach(nullabor::null_dist("es", dist = "normal", params = list(mean = summary_es_simul, sd = se_simul)),
                        true = data, n = n, p = 0)
-    names(x)[1] <- ".sample"
     if(show_solution == TRUE) {
       warning("If rorschach = TRUE the lineup only consists of null plots. Argument show_solution = TRUE ignored.")
       show_solution <- FALSE
@@ -383,7 +383,7 @@ funnelinf <- function(x, group = NULL, group_permut = FALSE, n = 20, null_model 
       min_x <- min(c(min_x, min(funneldata$x)))
       max_x <- max(c(max_x, max(funneldata$x)))
 
-      meandata <- data.frame (M = M, .sample = 1:n)
+      meandata <- data.frame(M = M, .sample = 1:n)
 
     }
     # determine egger's regression line

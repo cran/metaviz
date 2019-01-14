@@ -26,15 +26,6 @@
 #'bar heights within a given subgroup compared to other subgroups conveys information about the relative precision of the meta-analytic
 #'estimate within the subgroup.
 #'
-#'\bold{Available forest plot types}
-#'
-#'Different aspects of meta-analytic data can be shown in forest plots. Five different types are available in \code{viz_forest} via the \code{type} parameter.
-#'Argument \code{"standard"} (default) shows study results as well as summary results in the forest plot. \code{"study_only"} allows to only show study results without the meta-analytic summary estimate.
-#'\code{"summary_only"} can be used to only show meta-analytic summary estimate(s), which is primarily useful to visualize several subgroup results (using \code{group}).
-#'\code{"cumulative"} shows a cumulative meta-analysis, that is, meta-analytic summary effects are computed sequentially by adding each study one-by-one.
-#'Studies are added in the same order than they were supplied in \code{x}. Finally, \code{"sensitivity"} shows for each study the meta-analytic summary
-#'effect if that particular study is not considered in the computation of the summary effect (leave-one-out analysis).
-#'
 #'@param x data.frame or matrix with the effect sizes of all studies (e.g.,
 #'  correlations, log odds ratios, or Cohen \emph{d}) in the first column and their
 #'  respective standard errors in the second column. Alternatively, x can be the
@@ -54,25 +45,28 @@
 #'  subgroup summary effect, arranged in the order of the levels of \code{group}. Ignored if \code{study_table} and/or
 #'  \code{summary_table} is supplied.
 #'@param confidence_level numeric value. The confidence level for the plotted confidence bars.
-#'@param col character string specifying the color used for the error bars and summary diamond.
+#'@param col character string specifying the color used for the study-level error bars. Can be a vector of length \code{nrow(x)}
+#'  with colors for each study-level result individually.
 #'@param tick_col character string specifying the color used for the ticks indicating the point estimates.
+#'@param summary_col character string specifying the main color for plotting the summary effect(s). Can be a vector
+#'  with colors for each subgroup summary effect individually.
 #'@param text_size numeric value. Size of text in the forest plot. Default is 3.
 #'@param xlab character string specifying the label of the x axis. By default also used for the header of the aligned table if \code{annotate_CI} is \code{TRUE}.
 #'@param x_limit numeric vector of length 2 with the limits (minimum, maximum) of the x axis.
 #'@param x_trans_function function to transform the labels of the x axis. Common uses are to transform
 #'  log-odds-ratios or log-risk-ratios with \code{exp} to their original scale (odds ratios and risk ratios), or Fisher's z values
-#'  back to correlation coefficients using \code{tanh}. See vignette('metaviz').
+#'  back to correlation coefficients using \code{tanh}.
 #'@param x_breaks numeric vector of values for the breaks on the x-axis. When used in tandem with \code{x_trans_function}
 #'  the supplied values should be not yet transformed.
 #'@param annotate_CI logical scalar. Should the effect size and confidence interval values be shown as text in an aligned table on the right-hand side of the forest plot?
 #'@param study_table a data.frame with additional study-level variables which should be shown in an aligned table.
-#'  Has to be in the same order than \code{x}. See vignette('metaviz').
+#'  Has to be in the same order than \code{x}.
 #'@param summary_table a data.frame with additional summary-level information shown in an aligned table.
 #'  If \code{group} is supplied, \code{summary_table} must have a row for each subgroup
-#'  summary effect, arranged in the order of the levels of \code{group}. See vignette('metaviz').
+#'  summary effect, arranged in the order of the levels of \code{group}.
 #'@param table_headers character vector. Headers for each column of aligned tables via \code{study_table}, \code{summary_table}, or \code{annotate_CI}.
 #'@param table_layout numeric layout matrix passed to \code{layout_matrx} of \code{\link[gridExtra]{arrangeGrob}}. Can be used to overwrite the default spacing
-#'  of the forest plot and aligned tables via \code{study_table}, \code{summary_table}, and \code{annotate_CI}. See vignette('metaviz').
+#'  of the forest plot and aligned tables via \code{study_table}, \code{summary_table}, and \code{annotate_CI}.
 #'@references Schild, A. H., & Voracek, M. (2015). Finding your way out of the
 #'  forest without a trail of bread crumbs: Development and evaluation of two
 #'  novel displays of forest plots. \emph{Research Synthesis Methods}, \emph{6},
@@ -110,7 +104,7 @@
 #'@export
 viz_thickforest <- function(x, group = NULL, type = "standard", method = "FE",
                            study_labels = NULL, summary_label = NULL,
-                           confidence_level = 0.95, col = "Blues", tick_col = "firebrick",
+                           confidence_level = 0.95, col = "Blues", summary_col = col, tick_col = "firebrick",
                            text_size = 3, xlab = "Effect", x_limit = NULL,
                            x_trans_function = NULL, x_breaks = NULL, annotate_CI = FALSE,
                            study_table = NULL, summary_table = NULL, table_headers = NULL,
@@ -118,7 +112,7 @@ viz_thickforest <- function(x, group = NULL, type = "standard", method = "FE",
 
   viz_forest(x, group = group, type = type, variant = "thick", method = method,
              study_labels = study_labels, summary_label = summary_label,
-             confidence_level = confidence_level, col = col,  tick_col = tick_col,
+             confidence_level = confidence_level, col = col,  summary_col = summary_col, tick_col = tick_col,
              text_size = text_size, xlab = xlab, x_limit = x_limit,
              x_trans_function = x_trans_function, x_breaks = NULL,
              annotate_CI = annotate_CI, study_table = study_table, summary_table = summary_table,
