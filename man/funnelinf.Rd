@@ -4,13 +4,28 @@
 \alias{funnelinf}
 \title{Visual funnel plot inference for meta-analysis}
 \usage{
-funnelinf(x, group = NULL, group_permut = FALSE, n = 20,
-  null_model = "REM", y_axis = "se", contours = TRUE,
-  sig_contours = TRUE, contours_col = "Blues", trim_and_fill = FALSE,
-  trim_and_fill_side = "left", egger = FALSE, show_solution = FALSE,
-  rorschach = FALSE, point_size = 1.5, text_size = 3,
-  xlab = "Effect", ylab = NULL, x_trans_function = NULL,
-  x_breaks = NULL)
+funnelinf(
+  x,
+  group = NULL,
+  group_permut = FALSE,
+  n = 20,
+  null_model = "REM",
+  y_axis = "se",
+  contours = TRUE,
+  sig_contours = TRUE,
+  contours_col = "Blues",
+  trim_and_fill = FALSE,
+  trim_and_fill_side = "left",
+  egger = FALSE,
+  show_solution = FALSE,
+  rorschach = FALSE,
+  point_size = 1.5,
+  text_size = 3,
+  xlab = "Effect",
+  ylab = NULL,
+  x_trans_function = NULL,
+  x_breaks = NULL
+)
 }
 \arguments{
 \item{x}{data.frame or matrix with the effect sizes of all studies (e.g.,
@@ -78,12 +93,12 @@ Creates a lineup of funnel plots to conduct visual funnel plot inference (Kossme
 presented alongside null plots showing simulated data under the null hypothesis.
 }
 \details{
-Funnel plots are widely used in meta-analysis to assess small study effects as potential indicatior for publication bias.
+Funnel plots are widely used in meta-analysis to assess small study effects as potential indicator for publication bias.
 However, interpretations of funnel plots often lead to false conclusions about the presence and severity of bias (e.g., Terrin, Schmid, and Lau, 2005).
 Visual inference (Buja et al. 2009; Majumder, Hofmann, and Cook 2013) can help to improve the validity of conclusions based on the visual inspection of a
 funnel plot by saving investigators from interpreting funnel-plot patterns which might be perfectly plausible by chance.
 Only if the real-data funnel plot is distinguishable from null-plots, the null hypothesis is formally rejected and
-conclusions based on the visual inspection of the real-data funnel plot might be warranted (for furhter details, see Kossmeier, Tran, & Voracek, 2019).
+conclusions based on the visual inspection of the real-data funnel plot might be warranted (for further details, see Kossmeier, Tran, & Voracek, 2019).
 
 Function \code{funnelinf} utilizes package \pkg{nullabor} for null plot simulation and \pkg{ggplot2} for
 plotting the lineup. Several tailored features for visual inference with funnel plots are provided which currently include:

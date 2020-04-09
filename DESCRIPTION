@@ -2,7 +2,7 @@ Package: metaviz
 Type: Package
 Title: Forest Plots, Funnel Plots, and Visual Funnel Plot Inference for
         Meta-Analysis
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
     person("Michael", "Kossmeier", email = "michael.kossmeier@univie.ac.at", role = c("cre", "aut")),
     person("Ulrich S.", "Tran", email = "ulrich.tran@univie.ac.at", role = c("aut")),
@@ -21,15 +21,15 @@ Imports: ggplot2 (>= 3.1.0), nullabor (>= 0.3.5), dplyr (>= 0.7.8),
         2.2.1), ggpubr (>= 0.1.6)
 Suggests: Cairo (>= 1.5-9), knitr, rmarkdown
 Depends: R (>= 3.2.0)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 VignetteBuilder: knitr
 URL: https://github.com/Mkossmeier/metaviz
 BugReports: https://github.com/Mkossmeier/metaviz/issues
 NeedsCompilation: no
-Packaged: 2019-01-14 14:22:55 UTC; micha
+Packaged: 2020-04-07 17:43:53 UTC; micha
 Author: Michael Kossmeier [cre, aut],
   Ulrich S. Tran [aut],
   Martin Voracek [aut]
 Maintainer: Michael Kossmeier <michael.kossmeier@univie.ac.at>
 Repository: CRAN
-Date/Publication: 2019-01-14 14:40:03 UTC
+Date/Publication: 2020-04-09 09:10:08 UTC

@@ -4,13 +4,29 @@
 \alias{viz_funnel}
 \title{Funnel plot variants for meta-analysis}
 \usage{
-viz_funnel(x, group = NULL, y_axis = "se", method = "FE",
-  contours = TRUE, sig_contours = TRUE, addev_contours = FALSE,
-  contours_col = "Blues", detail_level = 1, egger = FALSE,
-  trim_and_fill = FALSE, trim_and_fill_side = "left", text_size = 3,
-  point_size = 2, xlab = "Effect", ylab = NULL,
-  group_legend = FALSE, group_legend_title = "",
-  x_trans_function = NULL, x_breaks = NULL)
+viz_funnel(
+  x,
+  group = NULL,
+  y_axis = "se",
+  method = "FE",
+  contours = TRUE,
+  sig_contours = TRUE,
+  addev_contours = FALSE,
+  contours_col = "Blues",
+  contours_type = "FEM",
+  detail_level = 1,
+  egger = FALSE,
+  trim_and_fill = FALSE,
+  trim_and_fill_side = "left",
+  text_size = 3,
+  point_size = 2,
+  xlab = "Effect",
+  ylab = NULL,
+  group_legend = FALSE,
+  group_legend_title = "",
+  x_trans_function = NULL,
+  x_breaks = NULL
+)
 }
 \arguments{
 \item{x}{data.frame or matrix with the effect sizes of all studies (e.g.,
@@ -27,7 +43,7 @@ standard error and "precision" for the reciprocal of the standard error.}
 \item{method}{character string indicating the method used to compute the meta-analytic summary effect and, for a random effects model,
 the between-study variance \eqn{\tau^2}{tau squared}. Can be any method argument from \code{\link[metafor]{rma.uni}}
 (e.g., "FE" for the fixed effect model, or "DL" for the random effects model using the DerSimonian-Laird method to estimate \eqn{\tau^2}{tau squared}).
-Used for \code{contours}, and \code{addev_contours}.}
+If input \code{x} is an output object of function \code{\link[metafor]{rma.uni}} from package \pkg{metafor}, then the method is extracted from \code{x}.}
 
 \item{contours}{logical scalar indicating if classic funnel plot confidence contours and the summary effect
 should be displayed.}
@@ -39,6 +55,12 @@ Note: For \code{method} other than "FE" or "DL" runtime is increased significant
 
 \item{contours_col}{character string indicating the color palette used from package \pkg{RColorBrewer} for
 \code{sig_contours}, and \code{addev_contours}. Can be any of "Blues", "Greys", "Oranges", "Greens", "Reds", and "Purples".}
+
+\item{contours_type}{character string indicating how confidence contours are computed.
+Must be either "FEM" or "REM". If contours_type is set to "FEM" (default), contours are given as M +/- qnorm(0.975)*SE,
+with M the meta-analytic summary effect and SE the study standard error. If contours_type is set to "REM", contours are given as
+M +/- qnorm(0.975)*sqrt(SE^2 + \eqn{\tau^2}{tau squared}), with M again the meta-analytic summary effect, SE the study standard error
+and \eqn{\tau^2}{tau squared} the esimated between study heterogeneity from a random effects model. The argument of contours_type has no effect if \eqn{\tau^2}{tau squared} is zero.}
 
 \item{detail_level}{numeric scalar. Allows to increase or decrease the plotting detail of contours. Values can be chosen between 0.1 and 10. Default is 1.}
 
@@ -102,20 +124,20 @@ Three different contours are available in \code{viz_funnel}:
 
 \bold{Measure on the y-axis}
 
-Two different options for the y-axis choice are available. First, to plot the standard errors on a reversed axis
+ Two different options for the y-axis choice are available. First, to plot the standard errors on a reversed axis
  (i.e., studies with small standard errors are at the top). Second, precision (i.e., 1 divided by the standard error) can be used.
  Standard errors on the y-axis should be preferred in most situations but precision might have advantages if one or few large studies
  (with high precision) should be compared to the results of smaller studies condensed at the bottom of the funnel plot (Sterne & Egger, 2001).
 
 \bold{Egger's regression line}
 
-Egger's regression line (Egger, Smith, Schneider & Minder, 1997) can be displayed if the standard error is used on the y axis.
+ Egger's regression line (Egger, Smith, Schneider & Minder, 1997) can be displayed if the standard error is used on the y axis.
  Classic Egger's regression can be computed as the OLS estimator of regressing the standardized effect size (effect size divided by its standard error)
  on precision (1 divided by the standard error). Showing this line in the funnel plot can further help to visually assess funnel plot asymmetry.
 
 \bold{Trim and fill analysis}
 
-Imputed studies by the trim-and fill method, as well as the adjusted summary effect (Duval & Tweedie, 2000) can be displayed.
+ Imputed studies by the trim-and fill method, as well as the adjusted summary effect (Duval & Tweedie, 2000) can be displayed.
  The trim-and fill algorithm basically estimates the number of (extreme) studies responsible for funnel plot asymmetry.
  It then trims this number of (extreme) studies and computes the adjusted summary effect only considering the remaining studies.
  Finally, it imputes studies - presumably missing due to publication bias - by mirroring the trimmed (extreme) studies (driving the funnel plot asymmetry)

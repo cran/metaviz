@@ -4,11 +4,26 @@
 \alias{viz_sunset}
 \title{Sunset (power-enhanced) funnel plot}
 \usage{
-viz_sunset(x, y_axis = "se", true_effect = NULL, sig_level = 0.05,
-  power_stats = TRUE, power_contours = "discrete", contours = FALSE,
-  sig_contours = TRUE, text_size = 3, point_size = 2,
-  xlab = "Effect", ylab = NULL, x_trans_function = NULL,
-  x_breaks = NULL, y_breaks = NULL, x_limit = NULL, y_limit = NULL)
+viz_sunset(
+  x,
+  y_axis = "se",
+  true_effect = NULL,
+  method = "FE",
+  sig_level = 0.05,
+  power_stats = TRUE,
+  power_contours = "discrete",
+  contours = FALSE,
+  sig_contours = TRUE,
+  text_size = 3,
+  point_size = 2,
+  xlab = "Effect",
+  ylab = NULL,
+  x_trans_function = NULL,
+  x_breaks = NULL,
+  y_breaks = NULL,
+  x_limit = NULL,
+  y_limit = NULL
+)
 }
 \arguments{
 \item{x}{data.frame or matrix with the effect sizes of all studies (e.g.,
@@ -20,14 +35,18 @@ output object of function \code{\link[metafor]{rma.uni}} from package
 \item{y_axis}{character string indicating which y axis should be used in the funnel plot. Available options are "se" (default) for
 standard error and "precision" for the reciprocal of the standard error.}
 
-\item{true_effect}{numeric scalar. Which true effect should be assumed for power caluclations? The default is \code{NULL},
-for which the meta-analytic summary effect (fixed-effect model) is used.}
+\item{true_effect}{numeric scalar. Which true effect should be assumed for power calculations? The default is \code{NULL},
+for which the meta-analytic summary effect is used (computed with \code{method}).}
+
+\item{method}{character string indicating the method used to compute the meta-analytic summary effect. Can be any method argument from \code{\link[metafor]{rma.uni}}
+(e.g., "FE" for the fixed effect model (default), or "DL" for the random effects model using the DerSimonian-Laird method to estimate \eqn{\tau^2}{tau squared}).
+If input \code{x} is an output object of function \code{\link[metafor]{rma.uni}} from package \pkg{metafor}, then the method is extracted from \code{x}.}
 
 \item{sig_level}{logical scalar. For which significance level alpha should the study power be computed?}
 
 \item{power_stats}{logical scalar. Should power-related statistics be computed and printed in the caption of the plot? (see details)}
 
-\item{power_contours}{character string specifying how different power regions are plotted. Can be eiter "continuous"
+\item{power_contours}{character string specifying how different power regions are plotted. Can be either "continuous"
 or "discrete" (default).}
 
 \item{contours}{logical scalar indicating if classic funnel plot confidence contours and the summary effect
@@ -52,9 +71,9 @@ the supplied values should be not yet transformed.}
 
 \item{y_breaks}{numeric vector of values for the breaks on the y-axis.}
 
-\item{x_limit}{numeric vector of length two with user specificed x axis limits.}
+\item{x_limit}{numeric vector of length two with user specified x axis limits.}
 
-\item{y_limit}{numeric vector of length two with user specificed y axis limits.}
+\item{y_limit}{numeric vector of length two with user specified y axis limits.}
 }
 \value{
 A power enhanced ("sunset") funnel plot is created using ggplot2.
@@ -66,9 +85,9 @@ Creates a funnel plot with power regions and computes power-related statistics.
 The funnel plot is the most widely used diagnostic plot in meta-analysis, primarily to assess
 small-study effects. The sunset (power-enhanced) funnel plot incorporates study-level power information
 in the funnel display. This directly allows to examine the power studies had to detect an effect of interest
-(e.g., the observed meta-analytic summary effect), whether funnel plot asymmetry is driven by underpowered but significanct studies, and to visually
+(e.g., the observed meta-analytic summary effect), whether funnel plot asymmetry is driven by underpowered but significant studies, and to visually
 assess if there is an excess of low-powered significant effects in the meta-analysis
-(conceptually related to the test of excess signficance, Ioannidis & Trikalinos, 2007).
+(conceptually related to the test of excess significance, Ioannidis & Trikalinos, 2007).
 For effect sizes assumed to be normally distributed (e.g., Cohen d, log OR),
 the power corresponding to a given standard error is computed by using a two-sided Wald test and (by default) the meta-analytic
 summary effect as assumed true effect. Colored regions of different power levels and a second axis with study level power are shown in the

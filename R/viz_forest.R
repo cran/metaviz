@@ -32,6 +32,7 @@
 #'  Can be any method argument from function \code{rma.uni} of package \pkg{metafor}
 #'  (e.g., "FE" for the fixed effect model, or "DL" for the random effects model using the
 #'  DerSimonian-Laird method to estimate \eqn{\tau^2}{tau squared}).
+#'  If input \code{x} is an output object of function \code{\link[metafor]{rma.uni}} from package \pkg{metafor}, then the method is extracted from \code{x}.
 #'@param study_labels a character vector with names/identifiers to annotate each study in the forest plot.
 #'  Has to be in the same order than \code{x}. Ignored if \code{study_table} and/or \code{summary_table} is supplied.
 #'@param summary_label a character string specifying the name to annotate the summary effect. If a subgroup
@@ -125,7 +126,8 @@ viz_forest <- function(x, group = NULL, type = "standard", variant = "classic", 
       group <- NULL
     }
     if(method != x$method) {
-      message("Note: method argument used differs from input object of class rma.uni (metafor)")
+      method <- x$method
+      # message("Note: method argument used differs from input object of class rma.uni (metafor)")
     }
     # If No group is supplied try to extract group from input object of class rma.uni (metafor)
     if(is.null(group) && ncol(x$X) > 1) {
@@ -488,7 +490,11 @@ viz_forest <- function(x, group = NULL, type = "standard", variant = "classic", 
       }
       v <- df_to_vector(tbl)
 
-      area_per_column <- cumsum(c(1, apply(rbind(tbl_titles, tbl), 2, function(x) max(round(max(nchar(x, keepNA = FALSE))/100, 2),  0.03))))
+      # For study labels with newlines in it, the width of the column is now set according to longest line and not the whole label
+      nchar2<-function(x){unlist(sapply(strsplit(x,"\n"), function(x) max(nchar(x, keepNA = FALSE))))}
+      area_per_column <- cumsum(c(1, apply(rbind(tbl_titles, tbl), 2, function(x) max(round(max(nchar2(x))/100, 2),  0.03))))
+      #area_per_column <- cumsum(c(1, apply(rbind(tbl_titles, tbl), 2, function(x) max(round(max(nchar(x, keepNA = FALSE))/100, 2),  0.03))))
+
       x_values <- area_per_column[1:ncol(tbl)]
       x_limit <- range(area_per_column)
 

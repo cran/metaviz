@@ -4,13 +4,28 @@
 \alias{viz_thickforest}
 \title{Thick forest plots for meta-analyses}
 \usage{
-viz_thickforest(x, group = NULL, type = "standard", method = "FE",
-  study_labels = NULL, summary_label = NULL, confidence_level = 0.95,
-  col = "Blues", summary_col = col, tick_col = "firebrick",
-  text_size = 3, xlab = "Effect", x_limit = NULL,
-  x_trans_function = NULL, x_breaks = NULL, annotate_CI = FALSE,
-  study_table = NULL, summary_table = NULL, table_headers = NULL,
-  table_layout = NULL)
+viz_thickforest(
+  x,
+  group = NULL,
+  type = "standard",
+  method = "FE",
+  study_labels = NULL,
+  summary_label = NULL,
+  confidence_level = 0.95,
+  col = "Blues",
+  summary_col = col,
+  tick_col = "firebrick",
+  text_size = 3,
+  xlab = "Effect",
+  x_limit = NULL,
+  x_trans_function = NULL,
+  x_breaks = NULL,
+  annotate_CI = FALSE,
+  study_table = NULL,
+  summary_table = NULL,
+  table_headers = NULL,
+  table_layout = NULL
+)
 }
 \arguments{
 \item{x}{data.frame or matrix with the effect sizes of all studies (e.g.,
@@ -27,7 +42,8 @@ output object of function \code{\link[metafor]{rma.uni}} from package
 \item{method}{character string indicating which method should be used to compute the study weights and summary effect(s).
 Can be any method argument from \code{\link[metafor]{rma.uni}}
 (e.g., "FE" for the fixed effect model, or "DL" for the random effects model using the
-DerSimonian-Laird method to estimate \eqn{\tau^2}{tau squared}).}
+DerSimonian-Laird method to estimate \eqn{\tau^2}{tau squared}).
+If input \code{x} is an output object of function \code{\link[metafor]{rma.uni}} from package \pkg{metafor}, then the method is extracted from \code{x}.}
 
 \item{study_labels}{a character vector with names/identifiers to annotate each study in the forest plot.
 Has to be in the same order than \code{x}. Ignored if \code{study_table} and/or \code{summary_table} is supplied.}

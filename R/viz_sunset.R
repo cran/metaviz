@@ -23,7 +23,10 @@
 #'@param y_axis character string indicating which y axis should be used in the funnel plot. Available options are "se" (default) for
 #'  standard error and "precision" for the reciprocal of the standard error.
 #'@param true_effect numeric scalar. Which true effect should be assumed for power calculations? The default is \code{NULL},
-#'  for which the meta-analytic summary effect (fixed-effect model) is used.
+#'  for which the meta-analytic summary effect is used (computed with \code{method}).
+#'@param method character string indicating the method used to compute the meta-analytic summary effect. Can be any method argument from \code{\link[metafor]{rma.uni}}
+#'  (e.g., "FE" for the fixed effect model (default), or "DL" for the random effects model using the DerSimonian-Laird method to estimate \eqn{\tau^2}{tau squared}).
+#'  If input \code{x} is an output object of function \code{\link[metafor]{rma.uni}} from package \pkg{metafor}, then the method is extracted from \code{x}.
 #'@param sig_level logical scalar. For which significance level alpha should the study power be computed?
 #'@param power_stats logical scalar. Should power-related statistics be computed and printed in the caption of the plot? (see details)
 #'@param power_contours character string specifying how different power regions are plotted. Can be either "continuous"
@@ -57,7 +60,7 @@
 #' # Create a power-enhanced ("sunset") funnel plot using confidence and significance contours
 #' viz_sunset(x = homeopath[, c("d", "se")], contours = TRUE)
 #'@export
-viz_sunset <- function(x, y_axis = "se", true_effect = NULL,
+viz_sunset <- function(x, y_axis = "se", true_effect = NULL, method = "FE",
                          sig_level = 0.05, power_stats = TRUE,
                          power_contours = "discrete", contours = FALSE, sig_contours = TRUE,
                          text_size = 3, point_size = 2, xlab = "Effect", ylab = NULL,
@@ -73,6 +76,10 @@ viz_sunset <- function(x, y_axis = "se", true_effect = NULL,
     # extract effect size and standard error
     es <- as.numeric(x$yi)
     se <- as.numeric(sqrt(x$vi))
+    if(method != x$method) {
+      method <- x$method
+      #message(paste0("Note: method argument from input object of class rma.uni (metafor) is used (", method, ")."))
+    }
   } else {
     # input is matrix or data.frame with effect sizes and standard errors in the first two columns
     if((is.data.frame(x) || is.matrix(x)) && ncol(x) >= 2) { # check if a data.frame or matrix with at least two columns is supplied
@@ -100,10 +107,9 @@ viz_sunset <- function(x, y_axis = "se", true_effect = NULL,
 
   # Compute meta-analytic summary using rma.uni (metafor) and supplied method
   k <- length(es)
-  if(is.null(true_effect) | contours == TRUE) {
-    summary_es <- metafor::rma.uni(yi = es, sei = se, method = "FE")$b[[1]]
-    summary_se <- sqrt(metafor::rma.uni(yi = es, sei = se, method = "FE")$vb[[1]])
-  }
+  summary_es <- metafor::rma.uni(yi = es, sei = se, method = method)$b[[1]]
+  summary_se <- sqrt(metafor::rma.uni(yi = es, sei = se, method = method)$vb[[1]])
+
 
   # main data for plotting
   plotdata <- data.frame(es, se)
@@ -334,6 +340,10 @@ viz_sunset <- function(x, y_axis = "se", true_effect = NULL,
       geom_path(data = funneldata, aes(x = x, y = y)) +
       geom_vline(xintercept = summary_es)
   }
+  if(true_effect != summary_es) {
+    p <- p +
+      geom_vline(xintercept = true_effect, linetype = "dashed")
+  }
   if(y_axis == "se") {
     if(is.null(y_breaks)) {
       p <-
@@ -354,6 +364,7 @@ viz_sunset <- function(x, y_axis = "se", true_effect = NULL,
                                          paste(round((1-stats::pnorm((stats::qnorm(1-sig_level/2)*x - true_effect)/x) + stats::pnorm((-stats::qnorm(1-sig_level/2)*x - true_effect)/x)) * 100, 1), "%", sep = "")}))
 
     }
+    y_limit <- rev(y_limit)
   } else {
     if(y_axis == "precision") {
       if(is.null(y_breaks)) {
@@ -402,17 +413,31 @@ viz_sunset <- function(x, y_axis = "se", true_effect = NULL,
     coord_cartesian(xlim = x_limit,
                     ylim = y_limit, expand = F)
   if(power_stats == TRUE) {
-  p <- p +
-    labs(caption = bquote(
-           paste(alpha, " = ", .(sig_level), ", ",
-                 delta , " = ", .(round(true_effect, 2)), " | ",
-                 med[power], " = ", .(med_power), ", ",
-                 d[33*'%'], " = ", .(d33), ", ",
-                 d[66*'%'], " = ", .(d66), " | ",
-                 "E = ",  .(round(expected, 2)), ", ",
-                 "O = ", .(observed), ", ",
-                 p[TES], " = ", .(p_tes), ", ",
-                 "R-Index = ", .(R), sep = "")))
+    if(is.null(x_trans_function)) {
+      p <- p +
+        labs(caption = bquote(
+               paste(alpha, " = ", .(sig_level), ", ",
+                     delta , " = ", .(round(true_effect, 2)), " | ",
+                     med[power], " = ", .(med_power), ", ",
+                     d[33*'%'], " = ", .(d33), ", ",
+                     d[66*'%'], " = ", .(d66), " | ",
+                     "E = ",  .(round(expected, 2)), ", ",
+                     "O = ", .(observed), ", ",
+                     p[TES], .(ifelse(p_tes == 0, " < ", " = ")), .(ifelse(p_tes == 0, "0.001", p_tes)), ", ",
+                     "R-Index = ", .(R), sep = "")))
+    } else {
+      p <- p +
+        labs(caption = bquote(
+          paste(alpha, " = ", .(sig_level), ", ",
+                delta , " = ", .(round(x_trans_function(true_effect), 2)), " | ",
+                med[power], " = ", .(med_power), ", ",
+                d[33*'%'], " = ", .(round(x_trans_function(d33), 2)), ", ",
+                d[66*'%'], " = ", .(round(x_trans_function(d66), 2)), " | ",
+                "E = ",  .(round(expected, 2)), ", ",
+                "O = ", .(observed), ", ",
+                p[TES], .(ifelse(p_tes == 0, " < ", " = ")), .(ifelse(p_tes == 0, "0.001", p_tes)), ", ",
+                "R-Index = ", .(R), sep = "")))
+    }
   }
   p <- p +
     theme_bw() +
